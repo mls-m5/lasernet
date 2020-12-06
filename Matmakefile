@@ -1,0 +1,23 @@
+# Matmake file
+# https://github.com/mls-m5/matmake
+
+cpp = clang++-10
+
+cppflags += -stdlib=libc++
+
+libs += -stdlib=libc++
+
+config += c++2a Wall
+
+dir = bin
+
+main.includes +=
+    include
+
+main.src =
+    src/**.cpp
+
+
+
+
+

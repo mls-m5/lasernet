@@ -1,0 +1,11 @@
+
+bin
+
+# qt creator
+*.cflags
+*.config
+*.creator
+*.cxxflags
+*.files
+*.includes
+
