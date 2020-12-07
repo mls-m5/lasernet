@@ -3,10 +3,6 @@
 
 cpp = clang++-10
 
-cppflags += -stdlib=libc++
-
-libs += -stdlib=libc++
-
 config += c++2a Wall
 
 dir = bin

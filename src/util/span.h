@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include <execution>
+#include <exception>
 
 template <typename T>
 struct Span {
@@ -10,34 +10,50 @@ struct Span {
 
     Span(T *begin, T *end) : _begin(begin), _end(end) {}
 
-    auto begin() {
+    T *begin() {
         return _begin;
     }
 
-    auto begin() const {
+    T *begin() const {
         return _begin;
     }
 
-    auto end() {
+    T *end() {
         return _end;
     }
 
-    auto end() const {
+    T *end() const {
         return _end;
     }
 
-    auto at(size_t index) {
-        if (index > (_end - _begin)) {
-            std::out_of_range("out of range in Span");
-        }
-        return _begin + index;
+    T &front() {
+        return *begin();
     }
 
-    auto at(size_t index) const {
+    T &back() {
+        return *(_end - 1);
+    }
+
+    T &front() const {
+        return *begin();
+    }
+
+    T &back() const {
+        return *(_end - 1);
+    }
+
+    T &at(size_t index) {
         if (index > (_end - _begin)) {
             std::out_of_range("out of range in Span");
         }
-        return _begin + index;
+        return *(_begin + index);
+    }
+
+    T &at(size_t index) const {
+        if (index > (_end - _begin)) {
+            std::out_of_range("out of range in Span");
+        }
+        return *(_begin + index);
     }
 };
 
