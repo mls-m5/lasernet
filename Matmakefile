@@ -3,17 +3,28 @@
 
 cpp = clang++-10
 
-config += c++2a Wall
+config +=
+    c++2a
+    Wall
+    modules
 
 dir = bin
 
-main.includes +=
+includes +=
     include
+    src
+    test
+    lib/gsl/include
 
 main.src =
     src/**.cpp
+    src/**.cppm
+
+# ========= Test ============================
+
+src += test/%.cpp
+
+config += debug
 
 
-
-
-
+singlestraightline_test.out += test %
