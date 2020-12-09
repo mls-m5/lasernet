@@ -1,6 +1,6 @@
 #pragma once
 
-#include "network/inode.h"
+#include "graph/inode.h"
 
 class IOptimizer {
 public:

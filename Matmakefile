@@ -28,3 +28,5 @@ config += debug
 
 
 singlestraightline_test.out += test %
+
+graph_test.out += test %

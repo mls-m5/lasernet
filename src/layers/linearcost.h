@@ -1,20 +1,28 @@
 #pragma once
 
-#include "network/inode.h"
+#include "graph/inode.h"
 
 //! Layer that calculates the error beween train data and calculated output
 class LinearCost : public ICostFunction {
 public:
-    //    ConstSpanD _y;
+    // @see ICostFunction interface
+    void cost(ConstSpanD activation, ConstSpanD expected) override {
+        if (activation.size() != expected.size()) {
+            throw std::runtime_error("error layer does not match data size");
+        }
 
-    //    void setData(ConstSpanD y) override {
-    //        _y = y;
-    //    }
+        auto iy = expected.begin();
+        auto ia = activation.begin();
 
-    //    size_t size() override {
-    //        return _y.size();
-    //    }
+        double sum = 0;
 
+        for (; ia != activation.end(); ++ia, ++ia) {
+            auto val = *iy - *ia;
+            sum = val * val;
+        }
+    }
+
+    // @see ICostFunction interface
     void derive(ConstSpanD activation,
                 ConstSpanD expected,
                 SpanD derivative) override {

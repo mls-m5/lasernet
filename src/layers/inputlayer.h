@@ -1,6 +1,6 @@
 #pragma once
 
-#include "network.h"
+#include "graph.h"
 
 class InputLayer : public IInput {
     ConstSpanD _activation;

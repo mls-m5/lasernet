@@ -10,23 +10,14 @@ class ICostFunction {
 public:
     virtual ~ICostFunction() = default;
 
-    //    virtual void setData(ConstSpanD y) = 0;
+    virtual void cost(ConstSpanD activation, ConstSpanD expected) = 0;
 
     //! Calculate the "derivative", ie the error to backpropagate
     //! @param activation is the activation of the last layer before this
     virtual void derive(ConstSpanD activation,
                         ConstSpanD expected,
                         SpanD derivative) = 0;
-
-    //    virtual size_t size() = 0;
 };
-
-// class IInput {
-// public:
-//    virtual ~IInput() = default;
-
-//    virtual ConstSpanD input() = 0;
-//};
 
 class INode {
 public:
@@ -50,7 +41,7 @@ public:
     //! be passed on to the backpropagation function
     virtual void calculateValues(ConstSpanD x,
                                  ConstSpanD parameters,
-                                 SpanD y) = 0;
+                                 SpanD activation) = 0;
 
     //! Calculate the derivative of a node given parameters and output of
     //! previous calculation

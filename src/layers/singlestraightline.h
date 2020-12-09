@@ -1,6 +1,6 @@
 #pragma once
 
-#include "network/inode.h"
+#include "graph/inode.h"
 
 //! Kind iof the simplest possible model
 //! One possible input. One "wheight" = derivative and one bias = constant
