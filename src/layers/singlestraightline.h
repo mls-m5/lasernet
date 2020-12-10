@@ -34,10 +34,12 @@ public:
 
     // @see INode
     void backpropagate(ConstSpanD /*x*/,
-                       ConstSpanD parameters,
+                       ConstSpanD /*parameters*/,
                        ConstSpanD /*activation*/,
                        ConstSpanD previousDerivative,
                        SpanD derivative) override {
-        derivative.front() = parameters[kIndex] * previousDerivative.front();
+        derivative.front() =
+            /*parameters[kIndex] **/ previousDerivative.front();
+        derivative.back() = 1;
     }
 };

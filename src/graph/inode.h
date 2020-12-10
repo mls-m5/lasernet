@@ -10,7 +10,7 @@ class ICostFunction {
 public:
     virtual ~ICostFunction() = default;
 
-    virtual void cost(ConstSpanD activation, ConstSpanD expected) = 0;
+    virtual double cost(ConstSpanD activation, ConstSpanD expected) = 0;
 
     //! Calculate the "derivative", ie the error to backpropagate
     //! @param activation is the activation of the last layer before this

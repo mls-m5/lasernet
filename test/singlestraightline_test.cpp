@@ -26,11 +26,12 @@ TEST_CASE("forward") {
 TEST_CASE("backpropagate") {
     auto line = SingleStraightLine{};
 
-    auto derivative = std::array{0.};
+    auto derivative = std::array{0., 0.};
 
-    line.backpropagate({{1.}}, {{2., 3.}}, {{5.}}, {{10.}}, derivative);
+    line.backpropagate({{1.}}, {{2., 3.}}, {{5.}}, {{10., 11.}}, derivative);
 
-    ASSERT_NEAR(derivative.front(), 2. * 10., eps);
+    ASSERT_NEAR(derivative.front(), 10., eps);
+    ASSERT_NEAR(derivative.back(), 1., eps);
 }
 
 TEST_SUIT_END

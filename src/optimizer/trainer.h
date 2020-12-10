@@ -1,6 +1,6 @@
 #pragma once
 
-#include "optimizer/dataset.h"
+#include "dataset/dataset.h"
 #include "optimizer/ioptimizer.h"
 #include <vector>
 
@@ -16,7 +16,8 @@ public:
         auto expectedOutput = SpanD{_dataset.data.at(_currentDataset).y};
 
         // Todo save these between runs, per thread
-        std::vector<double> parameters(node.parameterSize());
+        //        std::vector<double> parameters(node.parameterSize());
+        parameters.resize(node.parameterSize());
         std::vector<double> derivative(parameters.size());
         std::vector<double> activation(node.activationSize());
 
@@ -34,13 +35,22 @@ public:
 
         _optimizer->applyDerivative(derivative, learningRate, parameters);
 
-        ++_currentDataset;
+        if (++_currentDataset >= _dataset.data.size()) {
+            _currentDataset = 0;
+        }
+
+        _lastCost = cost.cost(node.output(activation), expectedOutput);
+    }
+
+    double cost() {
+        return _lastCost;
     }
 
 private:
     Dataset _dataset;
+    std::vector<double> parameters;
     IOptimizer *_optimizer;
     //    size_t _batchSize = 1;
-
     size_t _currentDataset = 0;
+    double _lastCost = 0;
 };

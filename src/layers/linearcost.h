@@ -6,7 +6,7 @@
 class LinearCost : public ICostFunction {
 public:
     // @see ICostFunction interface
-    void cost(ConstSpanD activation, ConstSpanD expected) override {
+    double cost(ConstSpanD activation, ConstSpanD expected) override {
         if (activation.size() != expected.size()) {
             throw std::runtime_error("error layer does not match data size");
         }
@@ -16,10 +16,12 @@ public:
 
         double sum = 0;
 
-        for (; ia != activation.end(); ++ia, ++ia) {
-            auto val = *iy - *ia;
+        for (; ia != activation.end(); ++iy, ++ia) {
+            auto val = *ia - *iy;
             sum = val * val;
         }
+
+        return sum / 2.;
     }
 
     // @see ICostFunction interface
@@ -34,8 +36,8 @@ public:
         auto ia = activation.begin();
         auto id = derivative.begin();
 
-        for (; ia != activation.end(); ++ia, ++ia, ++id) {
-            *id = *iy - *ia;
+        for (; ia != activation.end(); ++iy, ++ia, ++id) {
+            *id = *ia - *iy;
         }
     }
 };
