@@ -44,8 +44,6 @@ public:
         _nodes.reserve(nodes.size());
         for (auto node : nodes) {
             auto sizes = node->dataSize();
-            //            auto parameterSize = node->parameterSize();
-            //            auto outputSize = node->outputSize();
 
             _nodes.push_back({
                 node,
@@ -75,25 +73,13 @@ public:
                                });
     }
 
-    //    // @see INode
-    //    size_t parameterSize() override {
-    //        return std::accumulate(
-    //            _nodes.begin(), _nodes.end(), 0, [](size_t sum, NodeInfo
-    //            &node) {
-    //                return sum + node.parameters.size;
-    //            });
-    //    }
+    //! @see INode
+    ConstSpanD input(ConstSpanD data) override {
+        auto &info = _nodes.front();
+        return info.input(info.input(data));
+    }
 
-    //    // @see INode
-    //    size_t outputSize() override {
-    //        return std::accumulate(_nodes.begin(),
-    //                               _nodes.end(),
-    //                               size_t{0},
-    //                               [](size_t sum, NodeInfo &node) {
-    //                                   return sum + node.output.size;
-    //                               });
-    //    }
-
+    //! @see INode
     ConstSpanD output(ConstSpanD data) override {
         auto &info = _nodes.back();
 

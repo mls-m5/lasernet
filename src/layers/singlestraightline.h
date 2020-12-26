@@ -11,16 +11,6 @@ class SingleStraightLine : public INode {
     static constexpr size_t mIndex = 1;
 
 public:
-    //    // @see INode
-    //    size_t parameterSize() override {
-    //        return 2;
-    //    }
-
-    //    // @see INode
-    //    size_t activationSize() override {
-    //        return 1; // A lines only needs one output value
-    //    }
-
     //! @see INode
     DataSize dataSize() override {
         return {
@@ -30,6 +20,12 @@ public:
         };
     }
 
+    //! @see INode
+    ConstSpanD input(ConstSpanD data) override {
+        return data;
+    }
+
+    //! @see INode
     ConstSpanD output(ConstSpanD data) override {
         return data;
     }

@@ -6,16 +6,6 @@
 //! This class is intended for testing
 class SingleBias : public INode {
 public:
-    //    //! @see INode
-    //    size_t parameterSize() {
-    //        return 1;
-    //    }
-
-    //    //! @see INode
-    //    size_t activationSize() {
-    //        return 1;
-    //    }
-
     //! @see INode
     DataSize dataSize() override {
         return {
@@ -23,6 +13,11 @@ public:
             .parameters = 1,
             .output = 1,
         };
+    }
+
+    //! @see INode
+    ConstSpanD input(ConstSpanD data) override {
+        return data;
     }
 
     //! @see INode

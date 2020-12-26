@@ -23,12 +23,6 @@ class INode {
 public:
     virtual ~INode() = default;
 
-    //    //! Number of values used for storing parameter data (ie weights and
-    //    biases) virtual size_t parameterSize() = 0;
-
-    //    //! Size of values to keep temporary data
-    //    virtual size_t activationSize() = 0;
-
     struct DataSize {
         //! Data required to store derivative for input (dE/dx)
         //! If the size is larger than the layers input size, the extra data is
@@ -47,9 +41,13 @@ public:
 
     virtual DataSize dataSize() = 0;
 
+    //! How much of the input data that is actual input
+    //! Most casess uses all data ie returns "data"
+    virtual ConstSpanD input(ConstSpanD data) = 0;
+
     //! How much of the data is being sent to the next layer
     //! Returns the portion of the activation data that is going to be used
-    //! If all is to be used, just return data
+    //! If all is to be used, just return argument
     virtual ConstSpanD output(ConstSpanD data) = 0;
 
     struct CalculateArgs {
