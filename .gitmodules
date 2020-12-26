@@ -4,3 +4,6 @@
 [submodule "lib/gsl"]
 	path = lib/gsl
 	url = https://github.com/microsoft/gsl
+[submodule "matmake"]
+	path = matmake
+	url = https://github.com/mls-m5/matmake

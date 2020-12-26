@@ -3,6 +3,8 @@
 
 cpp = clang++-10
 
+flags += -Wsuggest-override
+
 config +=
     c++2a
     Wall

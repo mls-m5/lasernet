@@ -22,11 +22,12 @@ TEST_CASE("properties") {
 
     auto graph = Graph{nodes};
 
-    ASSERT_EQ(graph.parameterSize(),
-              linea.parameterSize() + lineb.parameterSize());
+    auto sizes = graph.dataSize();
 
-    ASSERT_EQ(graph.activationSize(),
-              linea.activationSize() + lineb.activationSize());
+    ASSERT_EQ(sizes.parameters,
+              linea.dataSize().parameters + lineb.dataSize().parameters);
+
+    ASSERT_EQ(sizes.output, linea.dataSize().output + lineb.dataSize().output);
 
     auto activationData = std::vector<double>{1., 2.};
     auto output = graph.output(activationData);

@@ -1,37 +1,43 @@
 #pragma once
 
-#include "network/inode.h"
+#include "graph/inode.h"
 
 //! Offset one input to one output
 //! This class is intended for testing
 class SingleBias : public INode {
 public:
+    //    //! @see INode
+    //    size_t parameterSize() {
+    //        return 1;
+    //    }
+
+    //    //! @see INode
+    //    size_t activationSize() {
+    //        return 1;
+    //    }
+
     //! @see INode
-    size_t parameterSize() {
-        return 1;
+    DataSize dataSize() override {
+        return {
+            .input = 1,
+            .parameters = 1,
+            .output = 1,
+        };
     }
 
     //! @see INode
-    size_t activationSize() {
-        return 1;
-    }
-
-    //! @see INode
-    ConstSpanD output(ConstSpanD data) {
+    ConstSpanD output(ConstSpanD data) override {
         return data;
     }
 
     //! @see INode
-    void calculateValues(ConstSpanD x, ConstSpanD parameters, SpanD y) {
-        y[0] = x[0] + parameters[0];
+    void calculateValues(CalculateArgs args) override {
+        args.y.front() = args.x.front() + args.parameters.front();
     }
 
     //! @see INode
-    void backpropagate(ConstSpanD /*x*/,
-                       ConstSpanD /*parameters*/,
-                       ConstSpanD /*y*/,
-                       ConstSpanD previousDerivative,
-                       SpanD derivative) {
-        derivative[0] = previousDerivative[0];
+    void backpropagate(BackpropagateArgs args) override {
+        args.dEdw.front() = 1;
+        args.dEdx.front() = 1;
     }
 };

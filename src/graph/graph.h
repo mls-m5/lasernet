@@ -8,7 +8,7 @@
 //! A network is a collection of nodes that can be used as a single node
 class Graph : INode {
 public:
-    //! Partition a span into several smaller spans
+    //! Used to partition a span into several smaller spans
     struct SpanPart {
         size_t offset = 0;
         size_t size = 0;
@@ -22,61 +22,86 @@ public:
         }
     };
 
+    //! Used to define internal memory layout of data for storing all memory
+    //! required for all layers
     struct NodeInfo {
         INode *node = nullptr;
+        SpanPart input;
+
+        //! Node that "parameters" is used to define layout of both parameters
+        //! data and dEdw data
         SpanPart parameters;
-        SpanPart activation;
+
+        SpanPart output;
     };
 
     Graph() = default;
 
     Graph(std::vector<INode *> nodes) : _nodes() {
+        size_t inputPosition = 0;
         size_t parameterPosition = 0;
-        size_t activationPosition = 0;
+        size_t outputPosition = 0;
         _nodes.reserve(nodes.size());
         for (auto node : nodes) {
-            auto parameterSize = node->parameterSize();
-            auto activationSize = node->activationSize();
+            auto sizes = node->dataSize();
+            //            auto parameterSize = node->parameterSize();
+            //            auto outputSize = node->outputSize();
 
             _nodes.push_back({
                 node,
-                {parameterPosition, parameterSize},
-                {activationPosition, activationSize},
+                {inputPosition, sizes.input},
+                {parameterPosition, sizes.parameters},
+                {outputPosition, sizes.output},
             });
 
-            parameterPosition += parameterSize;
-            activationPosition += activationSize;
+            inputPosition += sizes.input;
+            parameterPosition += sizes.parameters;
+            outputPosition += sizes.output;
         }
     }
 
-    // @see INode
-    size_t parameterSize() override {
-        return std::accumulate(
-            _nodes.begin(), _nodes.end(), 0, [](size_t sum, NodeInfo &node) {
-                return sum + node.parameters.size;
-            });
-    }
+    //! @see INode
+    DataSize dataSize() override {
+        auto sum = DataSize{0, 0, 0};
 
-    // @see INode
-    size_t activationSize() override {
         return std::accumulate(_nodes.begin(),
                                _nodes.end(),
-                               size_t{0},
-                               [](size_t sum, NodeInfo &node) {
-                                   return sum + node.activation.size;
+                               sum,
+                               [](DataSize sum, NodeInfo &node) {
+                                   sum.input += node.input.size;
+                                   sum.parameters += node.parameters.size;
+                                   sum.output += node.output.size;
+                                   return sum;
                                });
     }
+
+    //    // @see INode
+    //    size_t parameterSize() override {
+    //        return std::accumulate(
+    //            _nodes.begin(), _nodes.end(), 0, [](size_t sum, NodeInfo
+    //            &node) {
+    //                return sum + node.parameters.size;
+    //            });
+    //    }
+
+    //    // @see INode
+    //    size_t outputSize() override {
+    //        return std::accumulate(_nodes.begin(),
+    //                               _nodes.end(),
+    //                               size_t{0},
+    //                               [](size_t sum, NodeInfo &node) {
+    //                                   return sum + node.output.size;
+    //                               });
+    //    }
 
     ConstSpanD output(ConstSpanD data) override {
         auto &info = _nodes.back();
 
-        return info.node->output(info.activation(data));
+        return info.node->output(info.output(data));
     }
 
     // @see INode
-    void calculateValues(ConstSpanD x,
-                         ConstSpanD parameters,
-                         SpanD activation) override {
+    void calculateValues(CalculateArgs args) override {
         if (_nodes.empty()) {
             throw std::runtime_error("calculateValues on empty graph");
         }
@@ -84,25 +109,26 @@ public:
         // First layer
         {
             auto &front = _nodes.front();
-            front.node->calculateValues(
-                x, front.parameters(parameters), front.activation(activation));
+            front.node->calculateValues({
+                .x = args.x,
+                .parameters = front.parameters(args.parameters),
+                .y = front.output(args.y),
+            });
         }
 
         // The rest of the layers
         for (size_t i = 1; i < _nodes.size(); ++i) {
             auto &info = _nodes.at(i);
-            info.node->calculateValues(_nodes.at(i - 1).activation(activation),
-                                       info.parameters(parameters),
-                                       info.activation(activation));
+            info.node->calculateValues({
+                .x = _nodes.at(i - 1).output(args.y),
+                .parameters = info.parameters(args.parameters),
+                .y = info.output(args.y),
+            });
         }
     }
 
     // @see INode
-    void backpropagate(ConstSpanD x,
-                       ConstSpanD parameters,
-                       ConstSpanD activation,
-                       ConstSpanD previousDerivative,
-                       SpanD derivative) override {
+    void backpropagate(BackpropagateArgs args) override {
         if (_nodes.size() < 2) {
             throw std::runtime_error(
                 "backpropagate on graph with size smaller than 0");
@@ -112,11 +138,14 @@ public:
         {
             auto &info = _nodes.back();
 
-            info.node->backpropagate(x,
-                                     info.parameters(parameters),
-                                     info.activation(activation),
-                                     previousDerivative,
-                                     info.activation(derivative));
+            info.node->backpropagate({
+                .x = args.x,
+                .parameters = info.parameters(args.parameters),
+                .y = info.output(args.y),
+                .dEdxPrev = args.dEdxPrev,
+                .dEdx = args.dEdx,
+                .dEdw = info.output(args.dEdw),
+            });
         }
 
         // All layers except the first and last
@@ -124,11 +153,14 @@ public:
             auto &previous = _nodes.at(i);
             auto &info = _nodes.at(i - 1);
 
-            info.node->backpropagate(x,
-                                     info.parameters(parameters),
-                                     info.activation(activation),
-                                     previous.activation(derivative),
-                                     info.activation(derivative));
+            info.node->backpropagate({
+                .x = args.x,
+                .parameters = info.parameters(args.parameters),
+                .y = info.output(args.y),
+                .dEdxPrev = previous.output(args.dEdw),
+                .dEdx = info.input(args.dEdx),
+                .dEdw = info.output(args.dEdw),
+            });
         }
     }
 

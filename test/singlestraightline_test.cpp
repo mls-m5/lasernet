@@ -9,8 +9,10 @@ TEST_SUIT_BEGIN
 TEST_CASE("create") {
     auto line = SingleStraightLine{};
 
-    ASSERT_EQ(line.parameterSize(), 2);
-    ASSERT_EQ(line.activationSize(), 1);
+    auto sizes = line.dataSize();
+    ASSERT_EQ(sizes.parameters, 2);
+    ASSERT_EQ(sizes.input, 1);
+    ASSERT_EQ(sizes.output, 1);
 }
 
 TEST_CASE("forward") {
@@ -18,7 +20,11 @@ TEST_CASE("forward") {
 
     auto y = std::array{0.};
 
-    line.calculateValues({{1.}}, {{2., 3.}}, y);
+    line.calculateValues({
+        .x = {{1.}},
+        .parameters = {{2., 3.}},
+        .y = y,
+    });
 
     ASSERT_NEAR(y.front(), 2. * 1. + 3., eps);
 }
@@ -26,12 +32,20 @@ TEST_CASE("forward") {
 TEST_CASE("backpropagate") {
     auto line = SingleStraightLine{};
 
-    auto derivative = std::array{0., 0.};
+    auto dEdw = std::array{0., 0.};
+    auto dEdx = std::array{0.};
 
-    line.backpropagate({{1.}}, {{2., 3.}}, {{5.}}, {{10., 11.}}, derivative);
+    line.backpropagate({
+        .x = {{1.}},
+        .parameters = {{2., 3.}},
+        .y = {{5.}},
+        .dEdxPrev = {{10., 11.}},
+        .dEdx = dEdx,
+        .dEdw = dEdw,
+    });
 
-    ASSERT_NEAR(derivative.front(), 10., eps);
-    ASSERT_NEAR(derivative.back(), 1., eps);
+    ASSERT_NEAR(dEdw.front(), 10., eps);
+    ASSERT_NEAR(dEdw.back(), 1., eps);
 }
 
 TEST_SUIT_END

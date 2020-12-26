@@ -11,14 +11,23 @@ class SingleStraightLine : public INode {
     static constexpr size_t mIndex = 1;
 
 public:
-    // @see INode
-    size_t parameterSize() override {
-        return 2;
-    }
+    //    // @see INode
+    //    size_t parameterSize() override {
+    //        return 2;
+    //    }
 
-    // @see INode
-    size_t activationSize() override {
-        return 1; // A lines only needs one output value
+    //    // @see INode
+    //    size_t activationSize() override {
+    //        return 1; // A lines only needs one output value
+    //    }
+
+    //! @see INode
+    DataSize dataSize() override {
+        return {
+            .input = 1,
+            .parameters = 2,
+            .output = 1,
+        };
     }
 
     ConstSpanD output(ConstSpanD data) override {
@@ -26,20 +35,17 @@ public:
     }
 
     // @see INode
-    void calculateValues(ConstSpanD x,
-                         ConstSpanD parameters,
-                         SpanD y) override {
-        y[0] = parameters[kIndex] * x.front() + parameters[mIndex];
+    void calculateValues(CalculateArgs args) override {
+        args.y[0] =
+            args.parameters[kIndex] * args.x.front() + args.parameters[mIndex];
     }
 
     // @see INode
-    void backpropagate(ConstSpanD /*x*/,
-                       ConstSpanD /*parameters*/,
-                       ConstSpanD /*activation*/,
-                       ConstSpanD previousDerivative,
-                       SpanD derivative) override {
-        derivative.front() =
-            /*parameters[kIndex] **/ previousDerivative.front();
-        derivative.back() = 1;
+    void backpropagate(BackpropagateArgs args) override {
+        args.dEdw.front() = args.dEdxPrev.front();
+        args.dEdw.back() = 1;
+
+        args.dEdx.front() =
+            args.parameters[kIndex] * args.x.front() * args.parameters.front();
     }
 };
