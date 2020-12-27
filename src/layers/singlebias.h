@@ -32,7 +32,7 @@ public:
 
     //! @see INode
     void backpropagate(BackpropagateArgs args) const override {
-        args.dEdw.front() = args.dEdxPrev.front();
-        args.dEdx.front() = args.dEdxPrev.front();
+        args.dEdw.front() = args.dEdy.front();
+        args.dEdx.front() = args.dEdy.front();
     }
 };

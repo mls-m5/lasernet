@@ -85,7 +85,8 @@ public:
 
         //! dEdx from previous layer
         //! ie previous dE/dx
-        ConstSpanD dEdxPrev;
+        //! Already calculated when backpropagating a specific layer
+        ConstSpanD dEdy;
 
         //! Change in error caused by each input (dE/dx)
         //! Derivative that is associated with x/input

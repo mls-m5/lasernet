@@ -128,7 +128,7 @@ public:
                 .x = args.x,
                 .parameters = info.parameters(args.parameters),
                 .y = info.output(args.y),
-                .dEdxPrev = args.dEdxPrev,
+                .dEdy = args.dEdy,
                 .dEdx = args.dEdx,
                 .dEdw = info.output(args.dEdw),
             });
@@ -143,7 +143,7 @@ public:
                 .x = args.x,
                 .parameters = info.parameters(args.parameters),
                 .y = info.output(args.y),
-                .dEdxPrev = previous.output(args.dEdw),
+                .dEdy = previous.output(args.dEdw),
                 .dEdx = info.input(args.dEdx),
                 .dEdw = info.output(args.dEdw),
             });

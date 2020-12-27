@@ -45,7 +45,7 @@ public:
     //! @see INode
     void backpropagate(BackpropagateArgs args) const override {
         for (auto i : msl::range(args.y.size())) {
-            args.dEdx[i] = args.y[i] ? args.dEdxPrev[i] : 0;
+            args.dEdx[i] = args.y[i] ? args.dEdy[i] : 0;
         }
     }
 };

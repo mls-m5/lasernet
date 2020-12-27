@@ -1,6 +1,7 @@
 #pragma once
 
 #include "dataset/dataset.h"
+#include "fmt/core.h"
 #include "msl/range.h"
 #include "optimizer/ioptimizer.h"
 #include <algorithm>
@@ -27,6 +28,8 @@ public:
         for (auto &parameter : _parameters) {
             parameter = .1; // Make sure that they are not zero
         }
+
+        _parameters.back() = 0; //! Todo: Remove this
     }
 
     struct BackPropagationData {
@@ -61,7 +64,7 @@ public:
             .x = input,
             .parameters = _parameters,
             .y = data.output,
-            .dEdxPrev = data.outputDerivative,
+            .dEdy = data.outputDerivative,
             .dEdx = data.dEdx,
             .dEdw = data.dEdw,
         });
@@ -74,6 +77,7 @@ public:
         auto data = BackPropagationData{sizes};
 
         std::vector<double> dEdwSum(data.dEdw.size());
+        double costSum = 0;
 
         const auto batchSize = _batchSize ? _batchSize : _dataset.data.size();
 
@@ -90,7 +94,7 @@ public:
                 ++_epoch;
             }
 
-            _lastCost = cost.cost(node.output(data.output), expectedOutput);
+            costSum += cost.cost(node.output(data.output), expectedOutput);
 
             for (auto i : msl::range(dEdwSum.size())) {
                 dEdwSum[i] += data.dEdw[i];
@@ -104,7 +108,11 @@ public:
                            return value / div;
                        });
 
-        constexpr double learningRate = .1;
+        _lastCost = costSum / batchSize;
+
+        constexpr double learningRate = .01;
+
+        fmt::print("   d: {}\t {}\n", dEdwSum.front(), dEdwSum.back());
         _optimizer->applyDerivative(dEdwSum, learningRate, _parameters);
     }
 

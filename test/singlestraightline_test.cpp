@@ -21,12 +21,12 @@ TEST_CASE("forward") {
     auto y = std::array{0.};
 
     line.calculateValues({
-        .x = {{1.}},
+        .x = {{1.5}},
         .parameters = {{2., 3.}},
         .y = y,
     });
 
-    ASSERT_NEAR(y.front(), 2. * 1. + 3., eps);
+    ASSERT_NEAR(y.front(), 2. * 1.5 + 3., eps);
 }
 
 TEST_CASE("backpropagate") {
@@ -39,12 +39,12 @@ TEST_CASE("backpropagate") {
         .x = {{1.}},
         .parameters = {{2., 3.}},
         .y = {{5.}},
-        .dEdxPrev = {{10.}},
+        .dEdy = {{10.}},
         .dEdx = dEdx,
         .dEdw = dEdw,
     });
 
-    ASSERT_NEAR(dEdw.front(), 20., eps);
+    ASSERT_NEAR(dEdw.front(), 10., eps);
     ASSERT_NEAR(dEdw.back(), 10., eps);
 
     ASSERT_NEAR(dEdx.front(), 20., eps);

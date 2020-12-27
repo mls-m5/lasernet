@@ -18,7 +18,7 @@ public:
 
         for (; ia != activation.end(); ++iy, ++ia) {
             auto val = *ia - *iy;
-            sum = val * val;
+            sum += val * val;
         }
 
         return sum / 2.;

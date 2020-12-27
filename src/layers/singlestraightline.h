@@ -39,12 +39,12 @@ public:
 
     //! @see INode
     void backpropagate(BackpropagateArgs args) const override {
-        args.dEdw.front() = args.parameters[kIndex] * args.dEdxPrev.front();
-        args.dEdw.back() = args.dEdxPrev.front();
+        // Constant/Weight
+        args.dEdw.front() = args.x[kIndex] * args.dEdy.front();
 
-        //        args.dEdx.front() = args.parameters[kIndex] *
-        //        args.dEdxPrev.front();
-        args.dEdx.front() =
-            args.dEdw.front(); // Its thes same for a straight line
+        // Bias
+        args.dEdw.back() = args.dEdy.front();
+
+        args.dEdx.front() = args.parameters[kIndex] * args.dEdy.front();
     }
 };
