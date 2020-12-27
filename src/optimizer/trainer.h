@@ -35,12 +35,12 @@ public:
     struct BackPropagationData {
         std::vector<double> dEdx; // Input derivative
         std::vector<double> dEdw; // Parameter derivative
-        std::vector<double> output;
-        std::vector<double> outputDerivative;
+        std::vector<double> y;
+        std::vector<double> dEdy;
 
         BackPropagationData(INode::DataSize sizes)
-            : dEdx(sizes.input), dEdw(sizes.parameters), output(sizes.output),
-              outputDerivative(sizes.output) {}
+            : dEdx(sizes.input), dEdw(sizes.parameters), y(sizes.output),
+              dEdy(sizes.output) {}
     };
 
     //! Step a single thread once
@@ -54,17 +54,16 @@ public:
         node.calculateValues({
             .x = input,
             .parameters = _parameters,
-            .y = data.output,
+            .y = data.y,
         });
 
-        cost.derive(
-            node.output(data.output), expectedOutput, data.outputDerivative);
+        cost.derive(node.output(data.y), expectedOutput, data.dEdy);
 
         node.backpropagate({
             .x = input,
             .parameters = _parameters,
-            .y = data.output,
-            .dEdy = data.outputDerivative,
+            .y = data.y,
+            .dEdy = data.dEdy,
             .dEdx = data.dEdx,
             .dEdw = data.dEdw,
         });
@@ -94,7 +93,7 @@ public:
                 ++_epoch;
             }
 
-            costSum += cost.cost(node.output(data.output), expectedOutput);
+            costSum += cost.cost(node.output(data.y), expectedOutput);
 
             for (auto i : msl::range(dEdwSum.size())) {
                 dEdwSum[i] += data.dEdw[i];

@@ -51,3 +51,5 @@ graph_test.out += test %
 trainer_test.out += test %
 
 relu_test.out += test %
+
+fulllayer_test.out += test %
