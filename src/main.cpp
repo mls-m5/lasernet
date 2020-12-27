@@ -34,8 +34,6 @@ int main(int, char **) {
     // LoadInput
     // auto data = load("mnist-for-example")
 
-    //    auto data = Dataset{{1, 2}}; // Todo: Fill with actual data
-
     auto optimizer = GradientDescent{};
 
     auto node = SingleStraightLine{}; // Or network in the future
@@ -47,10 +45,15 @@ int main(int, char **) {
     for (size_t i = 0; i < 2000; ++i) {
         trainer.step(node, cost);
 
-        fmt::print("step: {}\t cost: {}\n", i, trainer.cost());
+        fmt::print("step: {}\t cost: {} \t epoch: {}\n",
+                   i,
+                   trainer.cost(),
+                   trainer.epoch());
         fmt::print("\u001b[34;1m   k = {}, m = {} \u001b[0m\n",
                    trainer.parameters().front(),
                    trainer.parameters().back());
+
+        std::cout.flush();
     }
 
     return 0;

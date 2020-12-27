@@ -1,18 +1,25 @@
 #pragma once
 
 #include "dataset/dataset.h"
+#include "msl/range.h"
 #include "optimizer/ioptimizer.h"
+#include <algorithm>
 #include <vector>
 
 class Trainer {
 
 public:
+    //! @param batchsize:
+    //! 0: batch gradient descent (use the whole training set for each step)
+    //! 1: gradient descent (use only one sample for each step)
+    //! between 2 and ∞: mini-batch, (use the specified numbers of samples per
+    //! step before updating)
     Trainer(INode &node,
             IOptimizer &optimizer,
             Dataset dataset,
-            size_t /*batchSize*/ = 1)
-        : _dataset(std::move(dataset)), _optimizer(&optimizer)
-    /*, _batchSize(batchSize) */ {
+            size_t batchSize = 1)
+        : _dataset(std::move(dataset)), _optimizer(&optimizer),
+          _batchSize(batchSize) {
 
         auto sizes = node.dataSize();
         _parameters.resize(sizes.parameters);
@@ -33,14 +40,13 @@ public:
               outputDerivative(sizes.output) {}
     };
 
-    void step(const INode &node, const ICostFunction &cost) {
-        auto input = SpanD{_dataset.data.at(_currentDataset).x};
-        auto expectedOutput = SpanD{_dataset.data.at(_currentDataset).y};
-
-        auto sizes = node.dataSize();
-
-        // Todo: save between runs, one per thread and layer
-        BackPropagationData data{sizes};
+    //! Step a single thread once
+    //! That is calculate derivatives but do not apply them
+    void step(const INode &node,
+              const ICostFunction &cost,
+              ConstSpanD input,
+              ConstSpanD expectedOutput,
+              BackPropagationData &data) {
 
         node.calculateValues({
             .x = input,
@@ -59,20 +65,56 @@ public:
             .dEdx = data.dEdx,
             .dEdw = data.dEdw,
         });
+    }
 
-        constexpr double learningRate = .1;
+    void step(const INode &node, const ICostFunction &cost) {
+        // Todo: save between runs, one per thread and layer
 
-        _optimizer->applyDerivative(data.dEdw, learningRate, _parameters);
+        auto sizes = node.dataSize();
+        auto data = BackPropagationData{sizes};
 
-        if (++_currentDataset >= _dataset.data.size()) {
-            _currentDataset = 0;
+        std::vector<double> dEdwSum(data.dEdw.size());
+
+        const auto batchSize = _batchSize ? _batchSize : _dataset.data.size();
+
+        for ([[maybe_unused]] auto i : msl::range(batchSize)) {
+
+            auto input = ConstSpanD{_dataset.data.at(_currentDataset).x};
+            auto expectedOutput =
+                ConstSpanD{_dataset.data.at(_currentDataset).y};
+
+            step(node, cost, input, expectedOutput, data);
+
+            if (++_currentDataset >= _dataset.data.size()) {
+                _currentDataset = 0;
+                ++_epoch;
+            }
+
+            _lastCost = cost.cost(node.output(data.output), expectedOutput);
+
+            for (auto i : msl::range(dEdwSum.size())) {
+                dEdwSum[i] += data.dEdw[i];
+            }
         }
 
-        _lastCost = cost.cost(node.output(data.output), expectedOutput);
+        std::transform(dEdwSum.begin(),
+                       dEdwSum.end(),
+                       dEdwSum.begin(),
+                       [div = static_cast<double>(batchSize)](double value) {
+                           return value / div;
+                       });
+
+        constexpr double learningRate = .1;
+        _optimizer->applyDerivative(dEdwSum, learningRate, _parameters);
     }
 
     double cost() const {
         return _lastCost;
+    }
+
+    //! Return the nmuber of epocs trained
+    size_t epoch() const {
+        return _epoch;
     }
 
     ConstSpanD parameters() const {
@@ -83,7 +125,8 @@ private:
     Dataset _dataset;
     std::vector<double> _parameters; //! w
     IOptimizer *_optimizer;
-    //    size_t _batchSize = 1;
+    size_t _batchSize = 1;
     size_t _currentDataset = 0;
     double _lastCost = 0;
+    size_t _epoch = 0;
 };
