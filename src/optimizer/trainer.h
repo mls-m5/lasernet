@@ -16,10 +16,8 @@ public:
         std::vector<double> dEdw; // Parameter derivative
         std::vector<double> output;
 
-        BackPropagationData(size_t inputSize,
-                            size_t parameterSize,
-                            size_t outputSize)
-            : dEdx(0, inputSize), dEdw(parameterSize), output(outputSize) {}
+        BackPropagationData(INode::DataSize sizes)
+            : dEdx(sizes.input), dEdw(sizes.parameters), output(sizes.output) {}
     };
 
     void step(/*IInput *input,*/ INode &node, ICostFunction &cost) {
@@ -30,12 +28,8 @@ public:
 
         parameters.resize(sizes.parameters);
 
-        // Todo: save these between runs, per thread
-        //        std::vector<double> dEdx(sizes.input);
-        //        std::vector<double> dEdw(parameters.size());
-        //        std::vector<double> output(sizes.output);
-
-        BackPropagationData data{sizes.input, sizes.parameters, sizes.output};
+        // Todo: save between runs, one per thread and layer
+        BackPropagationData data{sizes};
 
         // Output
         std::vector<double> outputDerivative(expectedOutput.size());

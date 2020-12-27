@@ -3,8 +3,6 @@
 
 cpp = clang++-10
 
-flags += -Wsuggest-override
-
 config +=
     c++2a
     Wall
@@ -17,18 +15,37 @@ includes +=
     src
     test
     lib/gsl/include
+    lib/msl/include
+    lib/fmt/include
+
+
+# ======== libfmt ==========================
+
+fmt.src +=
+    lib/fmt/src/**.cc
+fmt.out = static fmt
+
+
+# ======== Main ============================
 
 main.src =
     src/**.cpp
     src/**.cppm
 
+main.link += fmt
+
+
 # ========= Test ============================
 
 src += test/%.cpp
+link += fmt
 
 config += debug
 
+## List of tests
 
 singlestraightline_test.out += test %
 
 graph_test.out += test %
+
+trainer_test.out += test %

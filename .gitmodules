@@ -7,3 +7,9 @@
 [submodule "matmake"]
 	path = matmake
 	url = https://github.com/mls-m5/matmake
+[submodule "lib/msl"]
+	path = lib/msl
+	url = https://github.com/mls-m5/msl
+[submodule "lib/fmt"]
+	path = lib/fmt
+	url = https://github.com/fmtlib/fmt

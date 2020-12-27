@@ -43,7 +43,7 @@ int main(int, char **) {
 
     auto cost = LinearCost{};
 
-    for (size_t i = 0; i < 20; ++i) {
+    for (size_t i = 0; i < 200; ++i) {
         trainer.step(node, cost);
 
         std::cout << "step: " << i << "\t cost: " << trainer.cost()
