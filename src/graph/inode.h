@@ -10,13 +10,13 @@ class ICostFunction {
 public:
     virtual ~ICostFunction() = default;
 
-    virtual double cost(ConstSpanD activation, ConstSpanD expected) = 0;
+    virtual double cost(ConstSpanD activation, ConstSpanD expected) const = 0;
 
     //! Calculate the "derivative", ie the error to backpropagate
     //! @param activation is the activation of the last layer before this
     virtual void derive(ConstSpanD activation,
                         ConstSpanD expected,
-                        SpanD derivative) = 0;
+                        SpanD derivative) const = 0;
 };
 
 class INode {
@@ -39,16 +39,16 @@ public:
         size_t output;
     };
 
-    virtual DataSize dataSize() = 0;
+    virtual DataSize dataSize() const = 0;
 
     //! How much of the input data that is actual input
     //! Most casess uses all data ie returns "data"
-    virtual ConstSpanD input(ConstSpanD data) = 0;
+    virtual ConstSpanD input(ConstSpanD data) const = 0;
 
     //! How much of the data is being sent to the next layer
     //! Returns the portion of the activation data that is going to be used
     //! If all is to be used, just return argument
-    virtual ConstSpanD output(ConstSpanD data) = 0;
+    virtual ConstSpanD output(ConstSpanD data) const = 0;
 
     struct CalculateArgs {
         //! Input to the node
@@ -66,7 +66,7 @@ public:
     //! @param parameters is the values for weights, biases, etc
     //! @param activation/y is the output from the function, this will in turn
     //! be passed on to the backpropagation function
-    virtual void calculateValues(CalculateArgs) = 0;
+    virtual void calculateValues(CalculateArgs) const = 0;
 
     //! Arguments for the backpropagate function
     //! Data is saved "somewhere else"
@@ -98,5 +98,5 @@ public:
 
     //! Calculate the derivative of a node given parameters and output of
     //! previous calculation
-    virtual void backpropagate(BackpropagateArgs) = 0;
+    virtual void backpropagate(BackpropagateArgs) const = 0;
 };

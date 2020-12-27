@@ -6,9 +6,9 @@
 
 class MockNode : public INode {
 public:
-    MOCK_METHOD0(DataSize, dataSize, (), override);
-    MOCK_METHOD1(ConstSpanD, input, (ConstSpanD data), override);
-    MOCK_METHOD1(ConstSpanD, output, (ConstSpanD data), override);
-    MOCK_METHOD1(void, calculateValues, (CalculateArgs), override);
-    MOCK_METHOD1(void, backpropagate, (BackpropagateArgs), override);
+    MOCK_METHOD0(DataSize, dataSize, (), const override);
+    MOCK_METHOD1(ConstSpanD, input, (ConstSpanD data), const override);
+    MOCK_METHOD1(ConstSpanD, output, (ConstSpanD data), const override);
+    MOCK_METHOD1(void, calculateValues, (CalculateArgs), const override);
+    MOCK_METHOD1(void, backpropagate, (BackpropagateArgs), const override);
 };

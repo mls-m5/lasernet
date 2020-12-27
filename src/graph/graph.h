@@ -59,13 +59,13 @@ public:
     }
 
     //! @see INode
-    DataSize dataSize() override {
+    DataSize dataSize() const override {
         auto sum = DataSize{0, 0, 0};
 
-        return std::accumulate(_nodes.begin(),
-                               _nodes.end(),
+        return std::accumulate(_nodes.cbegin(),
+                               _nodes.cend(),
                                sum,
-                               [](DataSize sum, NodeInfo &node) {
+                               [](DataSize sum, const NodeInfo &node) {
                                    sum.input += node.input.size;
                                    sum.parameters += node.parameters.size;
                                    sum.output += node.output.size;
@@ -74,20 +74,20 @@ public:
     }
 
     //! @see INode
-    ConstSpanD input(ConstSpanD data) override {
+    ConstSpanD input(ConstSpanD data) const override {
         auto &info = _nodes.front();
         return info.input(info.input(data));
     }
 
     //! @see INode
-    ConstSpanD output(ConstSpanD data) override {
+    ConstSpanD output(ConstSpanD data) const override {
         auto &info = _nodes.back();
 
         return info.node->output(info.output(data));
     }
 
     // @see INode
-    void calculateValues(CalculateArgs args) override {
+    void calculateValues(CalculateArgs args) const override {
         if (_nodes.empty()) {
             throw std::runtime_error("calculateValues on empty graph");
         }
@@ -114,7 +114,7 @@ public:
     }
 
     // @see INode
-    void backpropagate(BackpropagateArgs args) override {
+    void backpropagate(BackpropagateArgs args) const override {
         if (_nodes.size() < 2) {
             throw std::runtime_error(
                 "backpropagate on graph with size smaller than 0");

@@ -1,37 +1,36 @@
 #pragma once
 
 #include "graph/inode.h"
+#include "msl/range.h"
 #include <algorithm>
 
 class Relu : public INode {
-    size_t _inputSize;
-    size_t _outputSize;
+    size_t _size;
 
 public:
-    Relu(size_t inputSize, size_t outputSize)
-        : _inputSize(inputSize), _outputSize(outputSize) {}
+    Relu(size_t size) : _size(size) {}
 
     //! @see INode
-    DataSize dataSize() override {
+    DataSize dataSize() const override {
         return {
-            .input = _inputSize,
+            .input = _size,
             .parameters = 0,
-            .output = _outputSize,
+            .output = _size,
         };
     }
 
     //! @see INode
-    ConstSpanD input(ConstSpanD data) override {
+    ConstSpanD input(ConstSpanD data) const override {
         return data;
     }
 
     //! @see INode
-    ConstSpanD output(ConstSpanD data) override {
+    ConstSpanD output(ConstSpanD data) const override {
         return data;
     }
 
     //! @see INode
-    void calculateValues(CalculateArgs args) override {
+    void calculateValues(CalculateArgs args) const override {
         if (args.x.size() != args.y.size()) {
             throw std::range_error{"input and output does not match in " +
                                    std::string{__FILE__}};
@@ -44,7 +43,9 @@ public:
     }
 
     //! @see INode
-    void backpropagate(BackpropagateArgs) override {
-        throw std::runtime_error("not implemented");
+    void backpropagate(BackpropagateArgs args) const override {
+        for (auto i : msl::range(args.y.size())) {
+            args.dEdx[i] = args.y[i] ? args.dEdxPrev[i] : 0;
+        }
     }
 };

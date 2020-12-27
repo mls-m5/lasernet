@@ -7,7 +7,7 @@ class GradientDescent : public IOptimizer {
 public:
     void applyDerivative(ConstSpanD derivative,
                          double learningRate,
-                         SpanD parameters) {
+                         SpanD parameters) const {
         if (parameters.size() != derivative.size()) {
             throw std::invalid_argument(
                 "parameter and derivative size does not match");

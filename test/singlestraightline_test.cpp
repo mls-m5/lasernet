@@ -39,13 +39,15 @@ TEST_CASE("backpropagate") {
         .x = {{1.}},
         .parameters = {{2., 3.}},
         .y = {{5.}},
-        .dEdxPrev = {{10., 11.}},
+        .dEdxPrev = {{10.}},
         .dEdx = dEdx,
         .dEdw = dEdw,
     });
 
-    ASSERT_NEAR(dEdw.front(), 10., eps);
-    ASSERT_NEAR(dEdw.back(), 1., eps);
+    ASSERT_NEAR(dEdw.front(), 20., eps);
+    ASSERT_NEAR(dEdw.back(), 10., eps);
+
+    ASSERT_NEAR(dEdx.front(), 20., eps);
 }
 
 TEST_SUIT_END

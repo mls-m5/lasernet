@@ -1,3 +1,4 @@
+#include "fmt/core.h"
 #include "layers/linearcost.h"
 #include "layers/singlestraightline.h"
 #include "optimizer/gradientdescent.h"
@@ -37,17 +38,19 @@ int main(int, char **) {
 
     auto optimizer = GradientDescent{};
 
-    auto trainer = Trainer{optimizer, dataset, 1};
-
     auto node = SingleStraightLine{}; // Or network in the future
+
+    auto trainer = Trainer{node, optimizer, dataset, dataset.data.size()};
 
     auto cost = LinearCost{};
 
-    for (size_t i = 0; i < 200; ++i) {
+    for (size_t i = 0; i < 2000; ++i) {
         trainer.step(node, cost);
 
-        std::cout << "step: " << i << "\t cost: " << trainer.cost()
-                  << std::endl;
+        fmt::print("step: {}\t cost: {}\n", i, trainer.cost());
+        fmt::print("\u001b[34;1m   k = {}, m = {} \u001b[0m\n",
+                   trainer.parameters().front(),
+                   trainer.parameters().back());
     }
 
     return 0;

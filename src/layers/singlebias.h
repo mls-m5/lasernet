@@ -7,7 +7,7 @@
 class SingleBias : public INode {
 public:
     //! @see INode
-    DataSize dataSize() override {
+    DataSize dataSize() const override {
         return {
             .input = 1,
             .parameters = 1,
@@ -16,22 +16,22 @@ public:
     }
 
     //! @see INode
-    ConstSpanD input(ConstSpanD data) override {
+    ConstSpanD input(ConstSpanD data) const override {
         return data;
     }
 
     //! @see INode
-    ConstSpanD output(ConstSpanD data) override {
+    ConstSpanD output(ConstSpanD data) const override {
         return data;
     }
 
     //! @see INode
-    void calculateValues(CalculateArgs args) override {
+    void calculateValues(CalculateArgs args) const override {
         args.y.front() = args.x.front() + args.parameters.front();
     }
 
     //! @see INode
-    void backpropagate(BackpropagateArgs args) override {
+    void backpropagate(BackpropagateArgs args) const override {
         args.dEdw.front() = args.dEdxPrev.front();
         args.dEdx.front() = args.dEdxPrev.front();
     }

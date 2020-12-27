@@ -14,7 +14,9 @@ TEST_CASE("create") {
 
     auto optimizer = GradientDescent{};
 
-    auto trainer = Trainer{optimizer, dataset};
+    auto bias = SingleBias{};
+
+    auto trainer = Trainer{bias, optimizer, dataset};
 }
 
 TEST_CASE("step") {
@@ -24,7 +26,7 @@ TEST_CASE("step") {
 
     auto optimizer = GradientDescent{};
 
-    auto trainer = Trainer{optimizer, dataset};
+    auto trainer = Trainer{bias, optimizer, dataset};
 
     auto cost = LinearCost{};
 
@@ -38,7 +40,7 @@ TEST_CASE("expect loss to decrease") {
 
     auto optimizer = GradientDescent{};
 
-    auto trainer = Trainer{optimizer, dataset};
+    auto trainer = Trainer{bias, optimizer, dataset};
 
     auto cost = LinearCost{};
 

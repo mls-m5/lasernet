@@ -6,7 +6,7 @@
 class LinearCost : public ICostFunction {
 public:
     // @see ICostFunction interface
-    double cost(ConstSpanD activation, ConstSpanD expected) override {
+    double cost(ConstSpanD activation, ConstSpanD expected) const override {
         if (activation.size() != expected.size()) {
             throw std::runtime_error("error layer does not match data size");
         }
@@ -27,7 +27,7 @@ public:
     // @see ICostFunction interface
     void derive(ConstSpanD activation,
                 ConstSpanD expected,
-                SpanD derivative) override {
+                SpanD derivative) const override {
         if (activation.size() != expected.size()) {
             throw std::runtime_error("error layer does not match data size");
         }

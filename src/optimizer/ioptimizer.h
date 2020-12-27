@@ -6,5 +6,5 @@ class IOptimizer {
 public:
     virtual void applyDerivative(ConstSpanD derivative,
                                  double learningRate,
-                                 SpanD parameters) = 0;
+                                 SpanD parameters) const = 0;
 };

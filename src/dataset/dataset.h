@@ -10,9 +10,7 @@ public:
     };
 
     Dataset(std::vector<DataPair> data) : data(std::move(data)) {}
-    //    Dataset(const std::vector<DataPair> &data) : data(data) {}
 
-    // private:
     std::vector<DataPair> data;
 };
 
