@@ -1,10 +1,7 @@
 #pragma once
 
+#include "types/spand.h"
 #include <cstdint>
-#include <gsl/span>
-
-using SpanD = gsl::span<double>;
-using ConstSpanD = gsl::span<const double>;
 
 class ICostFunction {
 public:

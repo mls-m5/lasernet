@@ -34,6 +34,8 @@ main.src =
 
 main.link += fmt
 
+main.copy += dataset/*
+
 
 # ========= Test ============================
 

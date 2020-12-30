@@ -1,3 +1,4 @@
+#include "dataset/mnist.h"
 #include "fmt/core.h"
 #include "layers/linearcost.h"
 #include "layers/singlestraightline.h"
@@ -45,6 +46,10 @@ Dataset createDataset() {
 
 int main(int, char **) {
     // Test workflow:
+
+    auto minst = loadMnist("dataset");
+
+    printMnistImage(std::cout, minst.train.data[10].x);
 
     auto optimizer = GradientDescent{};
 
